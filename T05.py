@@ -189,7 +189,7 @@ dev_y = np.array(
     ]
 )
 # Set the plot style and figure size
-plt.style.use("fivethirtyeight")
+plt.style.use("ggplot")
 plt.figure(figsize=(12, 8))
 
 # Add title and axis labels
