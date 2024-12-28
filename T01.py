@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 import os
 
 os.makedirs("./plots/", exist_ok=True)
+print(plt.style.available)
 
 ages_x = [
     18,
