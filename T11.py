@@ -21,6 +21,49 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+def plot_candle_chart(df: pd.DataFrame, plt: plt):
+    """
+    Plots a candlestick chart using a given DataFrame.
+
+    Parameters:
+    - df (pd.DataFrame): DataFrame containing stock data with 'Open', 'Close', 'High', and 'Low' columns.
+    - plt (matplotlib.pyplot): Matplotlib plotting object.
+    """
+    # Separate green and red candles
+    green_candles = df[df["Close"] >= df["Open"]]
+    red_candles = df[df["Close"] < df["Open"]]
+
+    # Plot green candles (bullish)
+    plt.bar(
+        green_candles.index,
+        height=green_candles["Close"] - green_candles["Open"],  # Candle body height
+        bottom=green_candles["Open"],  # Starting point of the candle body
+        color="g",  # Green for bullish candles
+    )
+    plt.bar(
+        green_candles.index,
+        height=green_candles["High"] - green_candles["Low"],  # Candle wick height
+        bottom=green_candles["Low"],  # Starting point of the candle wick
+        color="g",  # Green for bullish candles
+        width=0.15,
+    )
+
+    # Plot red candles (bearish)
+    plt.bar(
+        red_candles.index,
+        height=red_candles["Open"] - red_candles["Close"],  # Candle body height
+        bottom=red_candles["Close"],
+        color="r",
+    )
+    plt.bar(
+        red_candles.index,
+        height=red_candles["High"] - red_candles["Low"],  # Candle wick height
+        bottom=red_candles["Low"],
+        color="r",
+        width=0.15,
+    )
+
+
 def calculate_slope(x_values, y_values):
     color = "r"
     x1, x2 = x_values
@@ -57,19 +100,19 @@ def plot_threshold_lines(df: pd.DataFrame, plt: plt, delta=60):
     # PLOT THRESHOLD LINE ONE
     plt.axhline(
         threshold_price,
-        label=f"{CORRECTION_FACTOR} From High",
+        label=f"{CORRECTION_FACTOR}% From 3 Month High",
         color=color,
     )
     # PLOT THRESHOLD LINE TWO
     plt.axhline(
         threshold_price_2,
-        label=f"{CORRECTION_FACTOR+.1} From High",
+        label=f"{CORRECTION_FACTOR+.1} From 3 Month High",
         color=color,
     )
     return color
 
 
-def highlight_partition_max(df: pd.DataFrame, plt: plt, partitions=4):
+def plot_quaters(df: pd.DataFrame, plt: plt, partitions=4):
     """
     Highlights the maximum 'High' values in each partition of the DataFrame.
 
@@ -124,21 +167,18 @@ def analyze_stock(symbol: str, analysis_date=datetime.today(), days=365):
     stock_data = stock.history(start=start_date, end=analysis_date)
 
     # Configure plot aesthetics
-    plt.style.use("fivethirtyeight")
+    # plt.style.use("fivethirtyeight")
     plt.figure(figsize=(15, 8))
     plt.grid(axis="x")
 
     # Highlight max values in partitions
-    c1 = highlight_partition_max(df=stock_data, plt=plt)
+    c1 = plot_quaters(df=stock_data, plt=plt)
     # Threshold Line
     c2 = plot_threshold_lines(stock_data, plt)
     c3 = plot_last_15_day_slope(stock_data, plt)
 
-    color = "b"
-    if c1 == c2 and c2 == c3:
-        color = c1
-    # Plot the 'High' price over time
-    plt.plot(stock_data.index, stock_data["High"], label="High Price", color=color)
+    # # Plot Candle Chart
+    plot_candle_chart(stock_data, plt)
 
     # Add plot labels and legend
     plt.legend()
@@ -146,16 +186,16 @@ def analyze_stock(symbol: str, analysis_date=datetime.today(), days=365):
     plt.xlabel("Date")
     plt.ylabel("Price")
     plt.tight_layout()
-    # plt.show()
-    plt.savefig(f"plots/STOCKS/{color}/{symbol}.png")
-    plt.close()
+    plt.show()
+    plt.savefig(f"plots/STOCKS/{symbol}.png")
+    # plt.close()
 
 
 # Example usage
 if __name__ == "__main__":
-    # analyze_stock("AAPL")
-    for stock in tqdm(stocks):
-        analyze_stock(stock)
+    analyze_stock("AAPL")
+    # for stock in tqdm(stocks):
+    #     analyze_stock(stock)
 
     # Display the final dataframe
     # print(df)
