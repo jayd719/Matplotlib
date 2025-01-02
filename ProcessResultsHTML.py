@@ -8,7 +8,7 @@ def image_tag(parent, filename, src="src"):
     """Generate an HTML image tag with a caption."""
     return (
         f'<figure class="image-item">'
-        f'<img width="100%" src="../{src}/{parent}/{filename}" alt="{filename}">'
+        f'<img width="50%" src="../{src}/{parent}/{filename}" alt="{filename}">'
         f"<figcaption>{parent}/{filename}</figcaption>"
         f"</figure>"
     )
